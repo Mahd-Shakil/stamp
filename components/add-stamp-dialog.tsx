@@ -52,30 +52,7 @@ export function AddStampDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <div className="relative">
-        {/* Perforated stamp edges around the dialog */}
-        <div className="pointer-events-none absolute -left-4 top-0 bottom-0 z-50 flex flex-col justify-around">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={`left-${i}`} className="h-5 w-5 rounded-full bg-background shadow-lg" />
-          ))}
-        </div>
-        <div className="pointer-events-none absolute -right-4 top-0 bottom-0 z-50 flex flex-col justify-around">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={`right-${i}`} className="h-5 w-5 rounded-full bg-background shadow-lg" />
-          ))}
-        </div>
-        <div className="pointer-events-none absolute -top-4 left-0 right-0 z-50 flex justify-around">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <div key={`top-${i}`} className="h-5 w-5 rounded-full bg-background shadow-lg" />
-          ))}
-        </div>
-        <div className="pointer-events-none absolute -bottom-4 left-0 right-0 z-50 flex justify-around">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <div key={`bottom-${i}`} className="h-5 w-5 rounded-full bg-background shadow-lg" />
-          ))}
-        </div>
-
-        <DialogContent className="max-w-2xl border-4 border-border bg-card shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <DialogContent className="max-w-2xl border-4 border-border bg-card shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <DialogHeader>
             <DialogTitle className="font-mono text-2xl">Request Verification</DialogTitle>
             <DialogDescription className="text-base">
@@ -85,19 +62,6 @@ export function AddStampDialog({
 
           {/* Stamp preview at top */}
           <div className="relative mx-auto w-full max-w-md">
-            <div className="absolute inset-0 overflow-hidden rounded-lg">
-              <div className="absolute inset-x-0 top-0 flex h-3 justify-between px-1">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <div key={`preview-top-${i}`} className="h-3 w-3 rounded-full bg-background" />
-                ))}
-              </div>
-              <div className="absolute inset-x-0 bottom-0 flex h-3 justify-between px-1">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <div key={`preview-bottom-${i}`} className="h-3 w-3 rounded-full bg-background" />
-                ))}
-              </div>
-            </div>
-
             <div className="relative overflow-hidden rounded-lg border-2 border-border bg-gradient-to-br from-primary/60 to-accent/60 p-6 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <div className="rounded-md border border-border bg-background/80 p-4 backdrop-blur-sm">
                 {formData.company_name || formData.role_title ? (
@@ -220,7 +184,6 @@ export function AddStampDialog({
             </div>
           </form>
         </DialogContent>
-      </div>
     </Dialog>
   )
 }
