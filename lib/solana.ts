@@ -52,7 +52,6 @@ export async function getWalletBalance(walletAddress: string): Promise<number> {
     const balance = await connection.getBalance(publicKey);
     return balance / LAMPORTS_PER_SOL;
   } catch (error) {
-    console.error('Error fetching balance:', error);
     return 0;
   }
 }
@@ -81,9 +80,6 @@ export async function mintCredentialSimplified(
   metadata: CredentialMetadata
 ): Promise<StoredCredential> {
   try {
-    console.log('Minting NFT credential for:', userWalletAddress);
-    console.log('Metadata:', metadata);
-
     // Prepare NFT metadata according to Metaplex standard
     const metadataJson = {
       name: `${metadata.company} - ${metadata.role}`,
@@ -99,12 +95,9 @@ export async function mintCredentialSimplified(
     };
 
     // Upload metadata (using mockStorage for demo - upgrade to IPFS for production)
-    console.log('Uploading metadata to decentralized storage...');
     const { uri } = await metaplex.nfts().uploadMetadata(metadataJson);
-    console.log('Metadata uploaded to:', uri);
 
     // Create the NFT on Solana blockchain
-    console.log('Creating NFT on blockchain...');
     const { nft } = await metaplex.nfts().create({
       uri,
       name: `Vouch: ${metadata.company}`,
@@ -119,17 +112,12 @@ export async function mintCredentialSimplified(
       isMutable: false, // Credential cannot be modified
     });
 
-    console.log('NFT minted successfully:', nft.address.toBase58());
-
     // Transfer NFT ownership to the user's wallet
-    console.log('Transferring NFT to user wallet...');
     const userPublicKey = new PublicKey(userWalletAddress);
     await metaplex.nfts().transfer({
       nftOrSft: nft,
       toOwner: userPublicKey,
     });
-
-    console.log('NFT transferred to user:', userWalletAddress);
 
     return {
       tokenAddress: nft.address.toBase58(),
@@ -137,7 +125,6 @@ export async function mintCredentialSimplified(
       mintedAt: new Date().toISOString(),
     };
   } catch (error: any) {
-    console.error('Error minting NFT:', error);
     throw new Error(`Failed to mint credential NFT: ${error.message}`);
   }
 }

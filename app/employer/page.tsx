@@ -33,7 +33,6 @@ export default function EmployerDashboard() {
         .single();
 
       if (employerError || !employerData) {
-        console.error('Error fetching employer:', employerError);
         // Not an employer, redirect to user dashboard
         router.push('/dashboard');
         return;
@@ -53,7 +52,7 @@ export default function EmployerDashboard() {
         setRequests(requestData);
       }
     } catch (error) {
-      console.error('Error:', error);
+      // Silently handle errors
     } finally {
       setLoading(false);
     }

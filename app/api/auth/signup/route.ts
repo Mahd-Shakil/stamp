@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
       message: 'User profile created successfully',
     });
   } catch (error: any) {
-    console.error('Signup error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to create user profile' },
       { status: 500 }

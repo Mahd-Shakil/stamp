@@ -18,6 +18,11 @@ export default function Dashboard() {
     proof_link: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [parsingPdf, setParsingPdf] = useState(false);
+  const [extractedExperiences, setExtractedExperiences] = useState<any[]>([]);
+  const [parseError, setParseError] = useState<string | null>(null);
+  const [showExtracted, setShowExtracted] = useState(false);
+  const [lastUploadTime, setLastUploadTime] = useState<number>(0);
 
   useEffect(() => {
     fetchUserData();
@@ -41,7 +46,6 @@ export default function Dashboard() {
         .single();
 
       if (userError || !userData) {
-        console.error('Error fetching user:', userError);
         router.push('/login');
         return;
       }
@@ -69,7 +73,7 @@ export default function Dashboard() {
         setEmployers(employerData);
       }
     } catch (error) {
-      console.error('Error:', error);
+      // Silently handle errors
     } finally {
       setLoading(false);
     }
@@ -94,7 +98,6 @@ export default function Dashboard() {
         .select();
 
       if (error) {
-        console.error('Error submitting request:', error);
         alert('Error: ' + error.message);
       } else {
         alert('✅ Verification request submitted successfully!');
@@ -112,6 +115,111 @@ export default function Dashboard() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function handlePdfUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      setParseError('Please upload a PDF file');
+      return;
+    }
+
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      setParseError('File size must be less than 10MB');
+      return;
+    }
+
+    // Rate limiting: prevent rapid requests (5 second cooldown)
+    const now = Date.now();
+    const timeSinceLastUpload = now - lastUploadTime;
+    if (timeSinceLastUpload < 5000) {
+      const waitTime = Math.ceil((5000 - timeSinceLastUpload) / 1000);
+      setParseError(`Please wait ${waitTime} second${waitTime > 1 ? 's' : ''} before trying again. Free models have rate limits.`);
+      e.target.value = '';
+      return;
+    }
+
+    setParsingPdf(true);
+    setParseError(null);
+    setExtractedExperiences([]);
+    setShowExtracted(false);
+    setLastUploadTime(now);
+
+    // Retry logic with exponential backoff
+    const maxRetries = 2;
+    let retryCount = 0;
+
+    const attemptParse = async (): Promise<void> => {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/resume/parse', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Check for rate limiting errors
+        const errorMsg = data.error || 'Failed to parse PDF';
+        if (errorMsg.includes('rate limit') || errorMsg.includes('429') || errorMsg.includes('Provider returned error')) {
+          if (retryCount < maxRetries) {
+            retryCount++;
+            const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff: 2s, 4s
+            setParseError(`Rate limited. Retrying in ${delay / 1000} seconds... (attempt ${retryCount + 1}/${maxRetries + 1})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return attemptParse();
+          } else {
+            throw new Error('Rate limit exceeded. Please wait a minute and try again, or enter the information manually.');
+          }
+        }
+        throw new Error(errorMsg);
+      }
+
+      if (data.work_experiences && data.work_experiences.length > 0) {
+        setExtractedExperiences(data.work_experiences);
+        setShowExtracted(true);
+      } else {
+        setParseError('No work experience found in the resume. Please enter manually.');
+      }
+    };
+
+    try {
+      await attemptParse();
+    } catch (error: any) {
+      setParseError(error.message || 'Failed to parse PDF. Please try again or enter manually.');
+    } finally {
+      setParsingPdf(false);
+      // Reset file input
+      e.target.value = '';
+    }
+  }
+
+  function handleSelectExperience(experience: any) {
+    // Try to match company name with existing employers (case-insensitive)
+    let matchedCompany = experience.company_name || '';
+    const employerNames = employers.map(e => e.organization_name);
+    const matched = employerNames.find(
+      name => name.toLowerCase() === matchedCompany.toLowerCase()
+    );
+    if (matched) {
+      matchedCompany = matched;
+    }
+
+    // Auto-fill form with selected experience
+    setFormData({
+      company_name: matchedCompany,
+      role_title: experience.role_title || '',
+      start_date: experience.start_date || '',
+      end_date: experience.end_date || '',
+      proof_link: formData.proof_link, // Keep existing proof link
+    });
+    setShowExtracted(false);
   }
 
   async function handleLogout() {
@@ -185,9 +293,80 @@ export default function Dashboard() {
 
         {/* Request Verification Form */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-4">
-            Request Experience Verification
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-semibold">
+              Request Experience Verification
+            </h2>
+            <div className="flex items-center gap-2">
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handlePdfUpload}
+                  disabled={parsingPdf}
+                  className="hidden"
+                  id="pdf-upload"
+                />
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-md font-medium hover:bg-purple-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed text-sm">
+                  {parsingPdf ? (
+                    <>
+                      <span className="animate-spin">⏳</span> Parsing...
+                    </>
+                  ) : (
+                    <>
+                      📄 Upload Resume PDF
+                    </>
+                  )}
+                </span>
+              </label>
+            </div>
+          </div>
+
+          {/* PDF Parse Error */}
+          {parseError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-sm text-red-800">{parseError}</p>
+            </div>
+          )}
+
+          {/* Extracted Experiences */}
+          {showExtracted && extractedExperiences.length > 0 && (
+            <div className="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+              <p className="text-sm font-medium text-purple-900 mb-3">
+                ✨ Found {extractedExperiences.length} work experience{extractedExperiences.length > 1 ? 's' : ''} in your resume:
+              </p>
+              <div className="space-y-2">
+                {extractedExperiences.map((exp, index) => (
+                  <div
+                    key={index}
+                    className="p-3 bg-white rounded border border-purple-200 hover:border-purple-400 transition"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900">{exp.role_title}</p>
+                        <p className="text-sm text-gray-600">{exp.company_name}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {exp.start_date} - {exp.end_date || 'Present'}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleSelectExperience(exp)}
+                        className="ml-3 px-3 py-1 bg-purple-600 text-white rounded text-sm font-medium hover:bg-purple-700 transition"
+                      >
+                        Use This
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => setShowExtracted(false)}
+                className="mt-3 text-sm text-purple-600 hover:text-purple-800 underline"
+              >
+                Or enter manually
+              </button>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

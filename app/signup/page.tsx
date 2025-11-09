@@ -83,7 +83,6 @@ export default function SignupPage() {
       // Force page reload to dashboard
       window.location.href = '/dashboard';
     } catch (error: any) {
-      console.error('Signup error:', error);
       setError(error.message || 'Failed to create account');
     } finally {
       setLoading(false);

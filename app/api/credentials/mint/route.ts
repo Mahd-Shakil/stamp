@@ -59,7 +59,6 @@ export async function POST(request: NextRequest) {
       message: 'Credential minted and approved successfully',
     });
   } catch (error: any) {
-    console.error('Minting error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to mint credential' },
       { status: 500 }
