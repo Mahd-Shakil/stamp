@@ -3,7 +3,7 @@ import Link from "next/link"
 
 export default function Hero() {
     return (
-        <section className="bg-secondary/30 px-4 py-16 pt-24 md:py-20 md:pt-28">
+        <section className="bg-secondary/30 px-4 py-32 pb-16 min-h-screen flex items-center justify-center">
             <div className="mx-auto max-w-4xl text-center">
                 <h1 className="mb-4 font-mono text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
                     Blockchain Resume Verification
