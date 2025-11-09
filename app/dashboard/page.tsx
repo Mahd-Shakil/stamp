@@ -1,322 +1,161 @@
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Check, X, Clock, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
-export default function Dashboard() {
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [credentials, setCredentials] = useState<any[]>([]);
-  const [employers, setEmployers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    company_name: '',
-    role_title: '',
-    start_date: '',
-    end_date: '',
-    proof_link: '',
-  });
-  const [submitting, setSubmitting] = useState(false);
+interface VerificationRequest {
+    id: string
+    userName: string
+    userEmail: string
+    role: string
+    period: string
+    status: "pending" | "approved" | "denied"
+    requestDate: string
+}
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+const mockRequests: VerificationRequest[] = [
+    {
+        id: "1",
+        userName: "Sarah Chen",
+        userEmail: "sarah.chen@email.com",
+        role: "Senior Software Engineer",
+        period: "Mar 2021 - Dec 2023",
+        status: "pending",
+        requestDate: "2024-01-15",
+    },
+    {
+        id: "2",
+        userName: "Michael Rodriguez",
+        userEmail: "m.rodriguez@email.com",
+        role: "Product Manager",
+        period: "Jun 2022 - Present",
+        status: "pending",
+        requestDate: "2024-01-14",
+    },
+    {
+        id: "3",
+        userName: "Emily Thompson",
+        userEmail: "emily.t@email.com",
+        role: "UI/UX Designer",
+        period: "Jan 2020 - Aug 2022",
+        status: "pending",
+        requestDate: "2024-01-13",
+    },
+]
 
-  async function fetchUserData() {
-    try {
-      // Get current authenticated user
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        router.push('/login');
-        return;
-      }
+export default function CompanyDashboardPage() {
+    const [requests, setRequests] = useState(mockRequests)
 
-      // Fetch user data from database
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('auth_id', session.user.id)
-        .single();
-
-      if (userError || !userData) {
-        console.error('Error fetching user:', userError);
-        router.push('/login');
-        return;
-      }
-
-      setUser(userData);
-
-      // Fetch user's credentials
-      const { data: credData, error: credError } = await supabase
-        .from('credential_requests')
-        .select('*')
-        .eq('user_id', userData.user_id)
-        .order('created_at', { ascending: false });
-
-      if (!credError && credData) {
-        setCredentials(credData);
-      }
-
-      // Fetch list of verified employers/companies
-      const { data: employerData, error: employerError } = await supabase
-        .from('employers')
-        .select('organization_name')
-        .order('organization_name');
-
-      if (!employerError && employerData) {
-        setEmployers(employerData);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
+    const handleApprove = (id: string) => {
+        setRequests(requests.map((req) => (req.id === id ? { ...req, status: "approved" as const } : req)))
     }
-  }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSubmitting(true);
-
-    try {
-      const { data, error } = await supabase
-        .from('credential_requests')
-        .insert({
-          user_id: user.user_id,
-          company_name: formData.company_name,
-          role_title: formData.role_title,
-          start_date: formData.start_date,
-          end_date: formData.end_date || null,
-          proof_link: formData.proof_link || null,
-          status: 'pending',
-        })
-        .select();
-
-      if (error) {
-        console.error('Error submitting request:', error);
-        alert('Error: ' + error.message);
-      } else {
-        alert('✅ Verification request submitted successfully!');
-        setFormData({
-          company_name: '',
-          role_title: '',
-          start_date: '',
-          end_date: '',
-          proof_link: '',
-        });
-        fetchUserData();
-      }
-    } catch (error: any) {
-      alert('Error: ' + error.message);
-    } finally {
-      setSubmitting(false);
+    const handleDeny = (id: string) => {
+        setRequests(requests.map((req) => (req.id === id ? { ...req, status: "denied" as const } : req)))
     }
-  }
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push('/');
-  }
-
-  if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl mb-2">⏳</div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header with logout */}
-        <div className="mb-8 flex justify-between items-center">
-          <a href="/" className="text-blue-600 hover:underline">← Back to Home</a>
-          <button
-            onClick={handleLogout}
-            className="text-red-600 hover:underline font-medium"
-          >
-            Log Out
-          </button>
-        </div>
-
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          Welcome, {user.name}!
-        </h1>
-        <p className="text-gray-600 mb-2">
-          Your Username: <span className="font-semibold">@{user.username}</span>
-        </p>
-        <p className="text-gray-600 mb-8">
-          Your Wallet: <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">{user.wallet_address}</span>
-        </p>
-
-        {/* Public Profile Link */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-          <p className="text-sm font-medium text-blue-900 mb-2">🔗 Your Public Vouch Profile:</p>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              readOnly
-              value={`${window.location.origin}/vouch/${user.username}`}
-              className="flex-1 px-3 py-2 bg-white border border-blue-300 rounded text-sm"
-            />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(`${window.location.origin}/vouch/${user.username}`);
-                alert('✅ Link copied to clipboard!');
-              }}
-              className="bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition"
-            >
-              Copy Link
-            </button>
-          </div>
-          <p className="text-xs text-blue-700 mt-2">
-            Share this link in your job applications!
-          </p>
-        </div>
-
-        {/* Request Verification Form */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-4">
-            Request Experience Verification
-          </h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Company/Institution Name
-              </label>
-              <select
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 bg-white"
-                value={formData.company_name}
-                onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-              >
-                <option value="">Select a verified company...</option>
-                {employers.map((employer) => (
-                  <option key={employer.organization_name} value={employer.organization_name}>
-                    {employer.organization_name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                ✅ Only verified companies are listed
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role/Degree Title
-              </label>
-              <input
-                type="text"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Software Engineer, BSc Computer Science"
-                value={formData.role_title}
-                onChange={(e) => setFormData({ ...formData, role_title: e.target.value })}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  value={formData.start_date}
-                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  End Date (optional)
-                </label>
-                <input
-                  type="date"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  value={formData.end_date}
-                  onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Proof Link (LinkedIn, screenshot, etc.)
-              </label>
-              <input
-                type="url"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                placeholder="https://linkedin.com/..."
-                value={formData.proof_link}
-                onChange={(e) => setFormData({ ...formData, proof_link: e.target.value })}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {submitting ? 'Submitting...' : 'Submit Verification Request'}
-            </button>
-          </form>
-        </div>
-
-        {/* Credentials List */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold mb-4">My Credentials</h2>
-          <div className="space-y-4">
-            {credentials.length > 0 ? (
-              credentials.map((cred: any) => (
-                <div
-                  key={cred.request_id}
-                  className="border border-gray-200 rounded-lg p-4 flex justify-between items-center"
+        <main className="min-h-screen bg-background px-4 py-8">
+            <div className="mx-auto max-w-6xl">
+                <Link
+                    href="/"
+                    className="mb-6 inline-flex items-center gap-2 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  <div>
-                    <h3 className="font-semibold text-lg">{cred.role_title}</h3>
-                    <p className="text-gray-600">{cred.company_name}</p>
-                    <p className="text-sm text-gray-500">
-                      {cred.start_date} - {cred.end_date || 'Present'}
-                    </p>
-                  </div>
-                  <div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        cred.status === 'approved'
-                          ? 'bg-green-100 text-green-800'
-                          : cred.status === 'rejected'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {cred.status === 'approved' && '✅'} {cred.status}
-                    </span>
-                  </div>
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Home
+                </Link>
+
+                <div className="mb-12">
+                    <h1 className="mb-2 font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                        Company Dashboard
+                    </h1>
+                    <p className="text-lg text-muted-foreground">Review and approve verification requests</p>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>No credentials yet. Submit a verification request above!</p>
-                <p className="text-sm mt-2">Once approved, your credentials will appear here.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+
+                <div>
+                    <div className="mb-6 flex items-center gap-3">
+                        <h2 className="font-mono text-xl font-bold text-foreground">Incoming Requests</h2>
+                        <span className="rounded-full border-2 border-border bg-primary px-3 py-1 font-mono text-sm font-bold text-primary-foreground">
+                            {requests.filter((r) => r.status === "pending").length}
+                        </span>
+                    </div>
+
+                    <div className="space-y-4">
+                        {requests.map((request) => (
+                            <div
+                                key={request.id}
+                                className="overflow-hidden rounded-lg border-2 border-border bg-card shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                            >
+                                <div className="p-6">
+                                    <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
+                                        <div>
+                                            <h3 className="mb-1 font-mono text-lg font-bold text-foreground">{request.userName}</h3>
+                                            <p className="text-sm text-muted-foreground">{request.userEmail}</p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {request.status === "pending" && (
+                                                <span className="flex items-center gap-1 rounded border-2 border-border bg-yellow-100 px-3 py-1 font-mono text-sm font-semibold text-yellow-900">
+                                                    <Clock className="h-4 w-4" />
+                                                    Pending
+                                                </span>
+                                            )}
+                                            {request.status === "approved" && (
+                                                <span className="flex items-center gap-1 rounded border-2 border-border bg-green-100 px-3 py-1 font-mono text-sm font-semibold text-green-900">
+                                                    <Check className="h-4 w-4" />
+                                                    Approved
+                                                </span>
+                                            )}
+                                            {request.status === "denied" && (
+                                                <span className="flex items-center gap-1 rounded border-2 border-border bg-red-100 px-3 py-1 font-mono text-sm font-semibold text-red-900">
+                                                    <X className="h-4 w-4" />
+                                                    Denied
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4 rounded-md border-2 border-border bg-muted/50 p-4">
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <span className="font-mono text-sm font-semibold text-muted-foreground">Position</span>
+                                            <span className="font-mono text-sm text-foreground">{request.role}</span>
+                                        </div>
+                                        <div className="mb-2 flex items-center justify-between">
+                                            <span className="font-mono text-sm font-semibold text-muted-foreground">Period</span>
+                                            <span className="font-mono text-sm text-foreground">{request.period}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-mono text-sm font-semibold text-muted-foreground">Requested</span>
+                                            <span className="font-mono text-sm text-foreground">{request.requestDate}</span>
+                                        </div>
+                                    </div>
+
+                                    {request.status === "pending" && (
+                                        <div className="flex gap-3">
+                                            <Button
+                                                onClick={() => handleDeny(request.id)}
+                                                variant="outline"
+                                                className="flex-1 border-2 border-border font-mono shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+                                            >
+                                                <X className="mr-2 h-4 w-4" />
+                                                Deny
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleApprove(request.id)}
+                                                className="flex-1 border-2 border-border bg-primary font-mono text-primary-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+                                            >
+                                                <Check className="mr-2 h-4 w-4" />
+                                                Approve
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </main>
+    )
 }
