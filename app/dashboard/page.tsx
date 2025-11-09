@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { StampCard } from "@/components/stamp-card"
 import { AddStampDialog } from "@/components/add-stamp-dialog"
-import { Plus, ArrowLeft, Upload } from "lucide-react"
+import { Plus, ArrowLeft, Upload, RefreshCw } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -240,7 +240,7 @@ export default function Dashboard() {
     company: cred.company_name,
     role: cred.role_title,
     period: `${cred.start_date} - ${cred.end_date || 'Present'}`,
-    status: cred.status as "verified" | "pending",
+    status: (cred.status === 'approved' ? 'verified' : 'pending') as "verified" | "pending",
     color: cred.status === 'approved' 
       ? ['from-yellow-400 to-amber-500', 'from-sky-300 to-blue-400', 'from-emerald-400 to-green-500'][index % 3]
       : 'from-slate-200 to-gray-300',
@@ -356,22 +356,22 @@ export default function Dashboard() {
 
           {/* PDF Parse Error */}
           {parseError && (
-            <div className="mb-4 p-3 bg-red-50 border-2 border-red-300 rounded-md">
-              <p className="text-sm text-red-800">{parseError}</p>
+            <div className="mb-4 rounded-lg border-2 border-border bg-card p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <p className="text-sm font-mono text-foreground">{parseError}</p>
             </div>
           )}
 
           {/* Extracted Experiences */}
           {showExtracted && extractedExperiences.length > 0 && (
-            <div className="mb-4 p-4 bg-purple-50 border-2 border-purple-300 rounded-lg">
-              <p className="text-sm font-semibold text-purple-900 mb-3 font-mono">
+            <div className="mb-4 rounded-lg border-2 border-border bg-card p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+              <p className="text-sm font-semibold text-foreground mb-3 font-mono">
                 ✨ Found {extractedExperiences.length} work experience{extractedExperiences.length > 1 ? 's' : ''} in your resume:
               </p>
               <div className="space-y-2">
                 {extractedExperiences.map((exp, index) => (
                   <div
                     key={index}
-                    className="p-3 bg-white rounded border-2 border-purple-200 hover:border-purple-400 transition"
+                    className="rounded-lg border-2 border-border bg-background p-3 transition-all hover:border-foreground/50 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)]"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -394,7 +394,7 @@ export default function Dashboard() {
               </div>
               <button
                 onClick={() => setShowExtracted(false)}
-                className="mt-3 text-sm text-purple-600 hover:text-purple-800 underline font-mono"
+                className="mt-3 text-sm text-muted-foreground hover:text-foreground underline font-mono transition-colors"
               >
                 Or enter manually
               </button>
@@ -417,7 +417,19 @@ export default function Dashboard() {
 
         {/* Stamps Collection */}
         <div>
-          <h2 className="mb-6 font-mono text-xl font-bold text-foreground">Your Stamps</h2>
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="font-mono text-xl font-bold text-foreground">Your Stamps</h2>
+            <Button
+              onClick={fetchUserData}
+              variant="outline"
+              size="sm"
+              disabled={loading}
+              className="border-2 border-border font-mono shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
           {stamps.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {stamps.map((stamp) => (
