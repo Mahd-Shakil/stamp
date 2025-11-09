@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = ['/', '/login', '/signup'];
-  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith('/vouch/');
+  const isPublicRoute = publicRoutes.includes(pathname) || pathname.startsWith('/stamp/');
 
   // Allow all routes for now (session management handled by pages)
   if (isPublicRoute) {

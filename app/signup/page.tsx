@@ -120,7 +120,7 @@ export default function SignupPage() {
                                     pattern="[a-zA-Z0-9_]+"
                                 />
                                 <p className="text-xs text-muted-foreground font-sans">
-                                    This will be your public profile URL: /vouch/{username || 'username'}
+                                    This will be your public profile URL: /stamp/{username || 'username'}
                                 </p>
                             </div>
 

@@ -315,13 +315,13 @@ export default function Dashboard() {
             <input
               type="text"
               readOnly
-              value={typeof window !== 'undefined' ? `${window.location.origin}/vouch/${user.username}` : ''}
+              value={typeof window !== 'undefined' ? `${window.location.origin}/stamp/${user.username}` : ''}
               className="flex-1 px-3 py-2 bg-input border-2 border-border rounded font-mono text-sm"
             />
             <Button
               onClick={() => {
                 if (typeof window !== 'undefined') {
-                  navigator.clipboard.writeText(`${window.location.origin}/vouch/${user.username}`)
+                  navigator.clipboard.writeText(`${window.location.origin}/stamp/${user.username}`)
                   toast({
                     title: "Success",
                     description: "Link copied to clipboard!",

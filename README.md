@@ -1,4 +1,4 @@
-# 🎓 Vouch - Blockchain Resume Verification
+# 🎓 Stamp - Blockchain Resume Verification
 
 A complete platform for issuing and verifying work experience credentials using Solana blockchain. Share your verified resume via a public link in job applications!
 
@@ -8,7 +8,7 @@ A complete platform for issuing and verifying work experience credentials using 
 - 📝 **Request Verification** - Submit work experience for employer approval
 - 🤖 **AI-Powered PDF Parsing** - Upload your resume PDF, AI auto-fills the form (powered by OpenRouter free models)
 - ✅ **Employer Dashboard** - Approve/reject requests, mint blockchain tokens
-- 🔗 **Public Vouch Profile** - Share `/vouch/username` in job applications
+- 🔗 **Public Stamp Profile** - Share `/stamp/username` in job applications
 - ⛓️ **Blockchain Verified** - All credentials stored on Solana
 - 🚀 **No Wallet Extension** - Everything handled in-app
 
@@ -20,9 +20,9 @@ A complete platform for issuing and verifying work experience credentials using 
 
 **Example Flow:**
 1. Otis worked at Meta 2022-2024
-2. Otis requests verification through Vouch
+2. Otis requests verification through Stamp
 3. Meta's HR approves → mints token to Otis's wallet
-4. Otis applies to Google, shares `/vouch/otis`
+4. Otis applies to Google, shares `/stamp/otis`
 5. Google recruiter sees blockchain-verified Meta credential instantly
 
 ## 🚀 Quick Start
@@ -101,7 +101,7 @@ Visit `http://localhost:3000`
 3. Solana wallet is automatically generated for you
 4. **Upload your resume PDF** - AI will extract work experience automatically, or enter manually
 5. Review and edit extracted data, then submit verification requests
-6. Copy your public vouch link: `/vouch/your-username`
+6. Copy your public stamp link: `/stamp/your-username`
 7. Share this link in job applications!
 
 ### As an Employer:
@@ -115,7 +115,7 @@ Visit `http://localhost:3000`
 ### As a Recruiter:
 
 1. Receive vouch link from job applicant
-2. Visit `/vouch/[username]` (no login needed)
+2. Visit `/stamp/[username]` (no login needed)
 3. See all blockchain-verified credentials
 4. Make informed hiring decisions
 
