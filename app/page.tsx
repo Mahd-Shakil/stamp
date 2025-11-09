@@ -1,7 +1,13 @@
-import Hero from '../components/hero'
-export default function Home() {
+import Hero from "../components/hero"
+import HowItWorks from "../components/howItWorks"
+import Footer from '../components/footer'
+export default function HomePage() {
     return (
-        <Hero />
-    );
+        <main className="min-h-screen">
+            <Hero />
+            <HowItWorks />
+            <Footer />
+        </main>
+    )
 }
 
