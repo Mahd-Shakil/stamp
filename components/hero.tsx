@@ -17,7 +17,7 @@ export default function Hero() {
                         size="lg"
                         className="border-2 border-border bg-primary font-mono text-primary-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
                     >
-                        <Link href="/user-dashboard">User Dashboard</Link>
+                        <Link href="/dashboard">User Dashboard</Link>
                     </Button>
                     <Button
                         variant="outline"
@@ -25,7 +25,7 @@ export default function Hero() {
                         asChild
                         className="border-2 border-border bg-card font-mono shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
                     >
-                        <Link href="/company-dashboard">Company Dashboard</Link>
+                        <Link href="/employer">Company Dashboard</Link>
                     </Button>
                 </div>
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm text-muted-foreground">

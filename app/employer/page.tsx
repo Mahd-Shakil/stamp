@@ -1,250 +1,161 @@
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Check, X, Clock, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
-export default function EmployerDashboard() {
-  const router = useRouter();
-  const [employer, setEmployer] = useState<any>(null);
-  const [requests, setRequests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState<string | null>(null);
+interface VerificationRequest {
+  id: string
+  userName: string
+  userEmail: string
+  role: string
+  period: string
+  status: "pending" | "approved" | "denied"
+  requestDate: string
+}
 
-  useEffect(() => {
-    fetchEmployerData();
-  }, []);
+const mockRequests: VerificationRequest[] = [
+  {
+    id: "1",
+    userName: "Sarah Chen",
+    userEmail: "sarah.chen@email.com",
+    role: "Senior Software Engineer",
+    period: "Mar 2021 - Dec 2023",
+    status: "pending",
+    requestDate: "2024-01-15",
+  },
+  {
+    id: "2",
+    userName: "Michael Rodriguez",
+    userEmail: "m.rodriguez@email.com",
+    role: "Product Manager",
+    period: "Jun 2022 - Present",
+    status: "pending",
+    requestDate: "2024-01-14",
+  },
+  {
+    id: "3",
+    userName: "Emily Thompson",
+    userEmail: "emily.t@email.com",
+    role: "UI/UX Designer",
+    period: "Jan 2020 - Aug 2022",
+    status: "pending",
+    requestDate: "2024-01-13",
+  },
+]
 
-  async function fetchEmployerData() {
-    try {
-      // Get current authenticated user
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        router.push('/login');
-        return;
-      }
+export default function CompanyDashboardPage() {
+  const [requests, setRequests] = useState(mockRequests)
 
-      // Fetch employer data from database
-      const { data: employerData, error: employerError } = await supabase
-        .from('employers')
-        .select('*')
-        .eq('auth_id', session.user.id)
-        .single();
-
-      if (employerError || !employerData) {
-        console.error('Error fetching employer:', employerError);
-        // Not an employer, redirect to user dashboard
-        router.push('/dashboard');
-        return;
-      }
-
-      setEmployer(employerData);
-
-      // Fetch pending requests for this employer's company
-      const { data: requestData, error: requestError } = await supabase
-        .from('credential_requests')
-        .select('*, users(*)')
-        .eq('company_name', employerData.organization_name)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-
-      if (!requestError && requestData) {
-        setRequests(requestData);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleApprove = (id: string) => {
+    setRequests(requests.map((req) => (req.id === id ? { ...req, status: "approved" as const } : req)))
   }
 
-  async function handleApprove(requestId: string, userWalletAddress: string, metadata: any) {
-    setProcessing(requestId);
-    try {
-      // Call API to mint token and update status
-      const response = await fetch('/api/credentials/mint', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          requestId,
-          userWalletAddress,
-          metadata,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to approve credential');
-      }
-
-      alert('✅ Credential approved and minted to blockchain!');
-      fetchEmployerData();
-    } catch (error: any) {
-      alert('Error: ' + error.message);
-    } finally {
-      setProcessing(null);
-    }
-  }
-
-  async function handleReject(requestId: string) {
-    setProcessing(requestId);
-    try {
-      const { error } = await supabase
-        .from('credential_requests')
-        .update({ 
-          status: 'rejected',
-          updated_at: new Date().toISOString()
-        })
-        .eq('request_id', requestId);
-
-      if (error) {
-        throw error;
-      }
-
-      alert('❌ Request rejected');
-      fetchEmployerData();
-    } catch (error: any) {
-      alert('Error: ' + error.message);
-    } finally {
-      setProcessing(null);
-    }
-  }
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push('/');
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl mb-2">⏳</div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!employer) {
-    return null;
+  const handleDeny = (id: string) => {
+    setRequests(requests.map((req) => (req.id === id ? { ...req, status: "denied" as const } : req)))
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header with logout */}
-        <div className="mb-8 flex justify-between items-center">
-          <a href="/" className="text-blue-600 hover:underline">← Back to Home</a>
-          <button
-            onClick={handleLogout}
-            className="text-red-600 hover:underline font-medium"
-          >
-            Log Out
-          </button>
+    <main className="min-h-screen bg-background px-4 py-8">
+      <div className="mx-auto max-w-6xl">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
+        </Link>
+
+        <div className="mb-12">
+          <h1 className="mb-2 font-mono text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+            Company Dashboard
+          </h1>
+          <p className="text-lg text-muted-foreground">Review and approve verification requests</p>
         </div>
 
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          {employer.organization_name} Dashboard
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Employer Portal - Review and approve verification requests
-        </p>
+        <div>
+          <div className="mb-6 flex items-center gap-3">
+            <h2 className="font-mono text-xl font-bold text-foreground">Incoming Requests</h2>
+            <span className="rounded-full border-2 border-border bg-primary px-3 py-1 font-mono text-sm font-bold text-primary-foreground">
+              {requests.filter((r) => r.status === "pending").length}
+            </span>
+          </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold mb-6">
-            Pending Verification Requests
-          </h2>
-
-          {loading ? (
-            <div className="text-center py-12 text-gray-500">
-              <p>Loading requests...</p>
-            </div>
-          ) : requests.length > 0 ? (
-            <div className="space-y-4">
-              {requests.map((request: any) => (
-                <div
-                  key={request.request_id}
-                  className="border border-gray-200 rounded-lg p-6"
-                >
-                  <div className="flex justify-between items-start mb-4">
+          <div className="space-y-4">
+            {requests.map((request) => (
+              <div
+                key={request.id}
+                className="overflow-hidden rounded-lg border-2 border-border bg-card shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              >
+                <div className="p-6">
+                  <div className="mb-4 flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <h3 className="text-xl font-semibold">
-                        {request.role_title}
-                      </h3>
-                      <p className="text-gray-600">{request.company_name}</p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Requested by: <span className="font-medium">{request.users?.name || 'Unknown'}</span>
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Email: {request.users?.email || 'N/A'}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        Wallet: {request.users?.wallet_address}
-                      </p>
+                      <h3 className="mb-1 font-mono text-lg font-bold text-foreground">{request.userName}</h3>
+                      <p className="text-sm text-muted-foreground">{request.userEmail}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">
-                        {request.start_date} - {request.end_date || 'Present'}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Submitted: {new Date(request.created_at).toLocaleDateString()}
-                      </p>
+                    <div className="flex items-center gap-2">
+                      {request.status === "pending" && (
+                        <span className="flex items-center gap-1 rounded border-2 border-border bg-yellow-100 px-3 py-1 font-mono text-sm font-semibold text-yellow-900">
+                          <Clock className="h-4 w-4" />
+                          Pending
+                        </span>
+                      )}
+                      {request.status === "approved" && (
+                        <span className="flex items-center gap-1 rounded border-2 border-border bg-green-100 px-3 py-1 font-mono text-sm font-semibold text-green-900">
+                          <Check className="h-4 w-4" />
+                          Approved
+                        </span>
+                      )}
+                      {request.status === "denied" && (
+                        <span className="flex items-center gap-1 rounded border-2 border-border bg-red-100 px-3 py-1 font-mono text-sm font-semibold text-red-900">
+                          <X className="h-4 w-4" />
+                          Denied
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {request.proof_link && (
-                    <div className="mb-4">
-                      <a
-                        href={request.proof_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-sm"
+                  <div className="mb-4 rounded-md border-2 border-border bg-muted/50 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="font-mono text-sm font-semibold text-muted-foreground">Position</span>
+                      <span className="font-mono text-sm text-foreground">{request.role}</span>
+                    </div>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="font-mono text-sm font-semibold text-muted-foreground">Period</span>
+                      <span className="font-mono text-sm text-foreground">{request.period}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-sm font-semibold text-muted-foreground">Requested</span>
+                      <span className="font-mono text-sm text-foreground">{request.requestDate}</span>
+                    </div>
+                  </div>
+
+                  {request.status === "pending" && (
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() => handleDeny(request.id)}
+                        variant="outline"
+                        className="flex-1 border-2 border-border font-mono shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
                       >
-                        🔗 View Proof →
-                      </a>
+                        <X className="mr-2 h-4 w-4" />
+                        Deny
+                      </Button>
+                      <Button
+                        onClick={() => handleApprove(request.id)}
+                        className="flex-1 border-2 border-border bg-primary font-mono text-primary-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
+                      >
+                        <Check className="mr-2 h-4 w-4" />
+                        Approve
+                      </Button>
                     </div>
                   )}
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleApprove(
-                        request.request_id,
-                        request.users?.wallet_address,
-                        {
-                          company: request.company_name,
-                          role: request.role_title,
-                          start_date: request.start_date,
-                          end_date: request.end_date || 'Present',
-                          verified_by: employer.organization_name,
-                        }
-                      )}
-                      disabled={processing === request.request_id}
-                      className="flex-1 bg-green-600 text-white py-2 rounded-md font-semibold hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {processing === request.request_id ? '⏳ Processing...' : '✅ Approve & Mint Token'}
-                    </button>
-                    <button
-                      onClick={() => handleReject(request.request_id)}
-                      disabled={processing === request.request_id}
-                      className="flex-1 bg-red-600 text-white py-2 rounded-md font-semibold hover:bg-red-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      ❌ Reject
-                    </button>
-                  </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-gray-500">
-              <p className="text-lg">No pending requests for {employer.organization_name}</p>
-              <p className="text-sm mt-2">When users submit verification requests for your company, they'll appear here</p>
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    </main>
+  )
 }
