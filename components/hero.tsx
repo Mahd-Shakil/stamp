@@ -17,7 +17,7 @@ export default function Hero() {
                         size="lg"
                         className="border-2 border-border bg-primary font-mono text-primary-foreground shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
                     >
-                        <Link href="/dashboard">User Dashboard</Link>
+                        <Link href="/signup">Get Started</Link>
                     </Button>
                     <Button
                         variant="outline"
