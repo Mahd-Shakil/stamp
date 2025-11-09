@@ -103,7 +103,7 @@ export function AddStampDialog({
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                ✅ Only verified companies are listed
+                Only verified companies are listed
               </p>
             </div>
 

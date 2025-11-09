@@ -37,7 +37,7 @@ export default async function PublicVouchProfile({ params }: PageProps) {
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">🎓 Vouch</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Vouch</h1>
           </div>
           <a 
             href="/" 
@@ -65,7 +65,7 @@ export default async function PublicVouchProfile({ params }: PageProps) {
             </div>
             <div className="text-right">
               <div className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                ✓ Blockchain Verified
+                Blockchain Verified
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default async function PublicVouchProfile({ params }: PageProps) {
                           {cred.role_title}
                         </h3>
                         <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
-                          ✓ Verified
+                          Verified
                         </span>
                       </div>
                       <p className="text-lg text-gray-700 font-medium mb-2">
@@ -130,7 +130,7 @@ export default async function PublicVouchProfile({ params }: PageProps) {
                       )}
                     </div>
                     <div className="text-5xl ml-4">
-                      🏆
+                      
                     </div>
                   </div>
                 </div>
@@ -138,7 +138,7 @@ export default async function PublicVouchProfile({ params }: PageProps) {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">📄</div>
+              <div className="text-6xl mb-4"></div>
               <p className="text-gray-500 text-lg">
                 No verified credentials yet
               </p>

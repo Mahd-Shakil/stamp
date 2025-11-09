@@ -100,9 +100,9 @@ export async function mintCredentialSimplified(
   metadata: CredentialMetadata
 ): Promise<StoredCredential> {
   try {
-    console.log('🔷 [SOLANA] Starting NFT minting process...');
-    console.log('🔷 [SOLANA] User Wallet Address:', userWalletAddress);
-    console.log('🔷 [SOLANA] Issuer Public Key:', issuerKeypair.publicKey.toBase58());
+    console.log('[SOLANA] Starting NFT minting process...');
+    console.log('[SOLANA] User Wallet Address:', userWalletAddress);
+    console.log('[SOLANA] Issuer Public Key:', issuerKeypair.publicKey.toBase58());
     
     // Prepare NFT metadata according to Metaplex standard
     const metadataJson = {
@@ -117,16 +117,16 @@ export async function mintCredentialSimplified(
         { trait_type: 'Verified By', value: metadata.verified_by },
       ],
     };
-    console.log('🔷 [SOLANA] Prepared NFT metadata:', JSON.stringify(metadataJson, null, 2));
+    console.log('[SOLANA] Prepared NFT metadata:', JSON.stringify(metadataJson, null, 2));
 
     // Upload metadata (using mockStorage for demo - upgrade to IPFS for production)
-    console.log('🔷 [SOLANA] Uploading metadata to storage...');
+    console.log('[SOLANA] Uploading metadata to storage...');
     const { uri } = await metaplex.nfts().uploadMetadata(metadataJson);
-    console.log('🔷 [SOLANA] ✅ Metadata uploaded successfully!');
-    console.log('🔷 [SOLANA] Metadata URI:', uri);
+    console.log('[SOLANA] ✅ Metadata uploaded successfully!');
+    console.log('[SOLANA] Metadata URI:', uri);
 
     // Create the NFT on Solana blockchain
-    console.log('🔷 [SOLANA] Creating NFT on Solana blockchain...');
+    console.log('[SOLANA] Creating NFT on Solana blockchain...');
     const { nft } = await metaplex.nfts().create({
       uri,
       name: `Vouch: ${metadata.company}`,
@@ -140,18 +140,18 @@ export async function mintCredentialSimplified(
       ],
       isMutable: false, // Credential cannot be modified
     });
-    console.log('🔷 [SOLANA] ✅ NFT created successfully!');
-    console.log('🔷 [SOLANA] NFT Mint Address:', nft.address.toBase58());
+    console.log('[SOLANA] ✅ NFT created successfully!');
+    console.log('[SOLANA] NFT Mint Address:', nft.address.toBase58());
 
     // Transfer NFT ownership to the user's wallet
-    console.log('🔷 [SOLANA] Transferring NFT to user wallet...');
+    console.log('[SOLANA] Transferring NFT to user wallet...');
     const userPublicKey = new PublicKey(userWalletAddress);
     await metaplex.nfts().transfer({
       nftOrSft: nft,
       toOwner: userPublicKey,
     });
-    console.log('🔷 [SOLANA] ✅ NFT transferred successfully to user!');
-    console.log('🔷 [SOLANA] 🎉 Complete! NFT minted and transferred');
+    console.log('[SOLANA] ✅ NFT transferred successfully to user!');
+    console.log('[SOLANA] 🎉 Complete! NFT minted and transferred');
 
     const result = {
       tokenAddress: nft.address.toBase58(),
@@ -159,12 +159,12 @@ export async function mintCredentialSimplified(
       mintedAt: new Date().toISOString(),
     };
     
-    console.log('🔷 [SOLANA] Final result:', result);
+    console.log('[SOLANA] Final result:', result);
     return result;
   } catch (error: any) {
-    console.error('🔷 [SOLANA] ❌ Error during minting:', error);
-    console.error('🔷 [SOLANA] Error message:', error.message);
-    console.error('🔷 [SOLANA] Error stack:', error.stack);
+    console.error('[SOLANA] ❌ Error during minting:', error);
+    console.error('[SOLANA] Error message:', error.message);
+    console.error('[SOLANA] Error stack:', error.stack);
     throw new Error(`Failed to mint credential NFT: ${error.message}`);
   }
 }

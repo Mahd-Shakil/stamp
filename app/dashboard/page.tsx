@@ -8,9 +8,11 @@ import { AddStampDialog } from "@/components/add-stamp-dialog"
 import { Plus, ArrowLeft, Upload, RefreshCw } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 
 export default function Dashboard() {
   const router = useRouter()
+  const { toast } = useToast()
   const [user, setUser] = useState<any>(null)
   const [credentials, setCredentials] = useState<any[]>([])
   const [employers, setEmployers] = useState<any[]>([])
@@ -103,9 +105,16 @@ export default function Dashboard() {
         .select()
 
       if (error) {
-        alert('Error: ' + error.message)
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        })
       } else {
-        alert('✅ Verification request submitted successfully!')
+        toast({
+          title: "Success",
+          description: "Verification request submitted successfully!",
+        })
         setFormData({
           company_name: '',
           role_title: '',
@@ -117,7 +126,11 @@ export default function Dashboard() {
         fetchUserData()
       }
     } catch (error: any) {
-      alert('Error: ' + error.message)
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
     } finally {
       setSubmitting(false)
     }
@@ -296,7 +309,7 @@ export default function Dashboard() {
 
         {/* Public Profile Link */}
         <div className="mb-8 rounded-lg border-2 border-border bg-card p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <p className="text-sm font-semibold text-foreground mb-2 font-mono">🔗 Your Public Profile:</p>
+          <p className="text-sm font-semibold text-foreground mb-2 font-mono">Your Public Profile:</p>
           <div className="flex gap-2">
             <input
               type="text"
@@ -308,7 +321,10 @@ export default function Dashboard() {
               onClick={() => {
                 if (typeof window !== 'undefined') {
                   navigator.clipboard.writeText(`${window.location.origin}/vouch/${user.username}`)
-                  alert('✅ Link copied to clipboard!')
+                  toast({
+                    title: "Success",
+                    description: "Link copied to clipboard!",
+                  })
                 }
               }}
               className="border-2 border-border font-mono shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]"
@@ -365,7 +381,7 @@ export default function Dashboard() {
           {showExtracted && extractedExperiences.length > 0 && (
             <div className="mb-4 rounded-lg border-2 border-border bg-card p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <p className="text-sm font-semibold text-foreground mb-3 font-mono">
-                ✨ Found {extractedExperiences.length} work experience{extractedExperiences.length > 1 ? 's' : ''} in your resume:
+                Found {extractedExperiences.length} work experience{extractedExperiences.length > 1 ? 's' : ''} in your resume:
               </p>
               <div className="space-y-2">
                 {extractedExperiences.map((exp, index) => (

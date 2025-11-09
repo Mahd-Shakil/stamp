@@ -8,7 +8,7 @@ async function airdrop() {
         const keypairPath = path.join(__dirname, '..', 'issuer-keypair.json');
 
         if (!fs.existsSync(keypairPath)) {
-            console.error('❌ issuer-keypair.json not found!');
+            console.error('issuer-keypair.json not found!');
             process.exit(1);
         }
 
@@ -31,7 +31,7 @@ async function airdrop() {
         // Check balance
         const balance = await connection.getBalance(publicKey);
     } catch (error) {
-        console.error('\n❌ Airdrop failed:', error.message);
+        console.error('\nAirdrop failed:', error.message);
         process.exit(1);
     }
 }

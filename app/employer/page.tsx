@@ -6,9 +6,11 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Check, X, Clock, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast"
 
 export default function EmployerDashboard() {
   const router = useRouter()
+  const { toast } = useToast()
   const [employer, setEmployer] = useState<any>(null)
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -81,10 +83,17 @@ export default function EmployerDashboard() {
         throw new Error(data.error || 'Failed to approve credential')
       }
 
-      alert('✅ Credential approved and minted to blockchain!')
+      toast({
+        title: "Success",
+        description: "Credential approved and minted to blockchain!",
+      })
       fetchEmployerData()
     } catch (error: any) {
-      alert('Error: ' + error.message)
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
     } finally {
       setProcessing(null)
     }
@@ -105,10 +114,17 @@ export default function EmployerDashboard() {
         throw error
       }
 
-      alert('❌ Request rejected')
+      toast({
+        title: "Success",
+        description: "Request rejected",
+      })
       fetchEmployerData()
     } catch (error: any) {
-      alert('Error: ' + error.message)
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
     } finally {
       setProcessing(null)
     }
