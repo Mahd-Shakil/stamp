@@ -51,30 +51,8 @@ export default function RegisterPage() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-accent/20 to-secondary/30 p-4">
             <div className="w-full max-w-md">
-                {/* Stamp-style card with perforated edges */}
+                {/* Stamp-style card */}
                 <div className="relative">
-                    {/* Perforated edges */}
-                    <div className="absolute -left-2 top-0 bottom-0 flex flex-col justify-around">
-                        {Array.from({ length: 14 }).map((_, i) => (
-                            <div key={`left-${i}`} className="h-4 w-4 rounded-full bg-background" />
-                        ))}
-                    </div>
-                    <div className="absolute -right-2 top-0 bottom-0 flex flex-col justify-around">
-                        {Array.from({ length: 14 }).map((_, i) => (
-                            <div key={`right-${i}`} className="h-4 w-4 rounded-full bg-background" />
-                        ))}
-                    </div>
-                    <div className="absolute -top-2 left-0 right-0 flex justify-around">
-                        {Array.from({ length: 12 }).map((_, i) => (
-                            <div key={`top-${i}`} className="h-4 w-4 rounded-full bg-background" />
-                        ))}
-                    </div>
-                    <div className="absolute -bottom-2 left-0 right-0 flex justify-around">
-                        {Array.from({ length: 12 }).map((_, i) => (
-                            <div key={`bottom-${i}`} className="h-4 w-4 rounded-full bg-background" />
-                        ))}
-                    </div>
-
                     {/* Card content */}
                     <div className="relative rounded-lg border-4 border-border bg-card p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                         <div className="mb-6 text-center">
