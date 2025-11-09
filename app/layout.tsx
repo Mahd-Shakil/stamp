@@ -11,16 +11,16 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode
+    children: React.ReactNode
 }>) {
-  return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-      <body>
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  )
+    return (
+        <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+            <body>
+                {children}
+                <Analytics />
+            </body>
+        </html>
+    )
 }
