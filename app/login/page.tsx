@@ -1,129 +1,155 @@
 'use client';
 
+import type React from "react"
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from "next/link"
 import { supabase } from '@/lib/supabase';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Mail, Lock } from "lucide-react"
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-    try {
-      // Sign in with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password,
-      });
+        try {
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Login failed');
+            if (authError) throw authError;
+            if (!authData.user) throw new Error('Login failed');
 
-      // Check if user is an employer
-      const { data: employerData } = await supabase
-        .from('employers')
-        .select('*')
-        .eq('auth_id', authData.user.id)
-        .single();
+            const { data: employerData } = await supabase
+                .from('employers')
+                .select('*')
+                .eq('auth_id', authData.user.id)
+                .single();
 
-      // Redirect based on role
-      const redirectPath = employerData ? '/employer' : '/dashboard';
-      window.location.href = redirectPath;
-      
-    } catch (error: any) {
-      setError(error.message || 'Failed to log in');
-      setLoading(false);
+            const redirectPath = employerData ? '/employer' : '/dashboard';
+            window.location.href = redirectPath;
+
+        } catch (error: any) {
+            setError(error.message || 'Failed to log in');
+            setLoading(false);
+        }
     }
-  }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome Back to Vouch
-          </h1>
-          <p className="text-gray-600">
-            Log in to manage your verified credentials
-          </p>
-        </div>
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary/30 to-accent/20 p-4">
+            <div className="w-full max-w-md">
+                <div className="relative">
+                    <div className="absolute -left-2 top-0 bottom-0 flex flex-col justify-around">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={`left-${i}`} className="h-4 w-4 rounded-full bg-background" />
+                        ))}
+                    </div>
+                    <div className="absolute -right-2 top-0 bottom-0 flex flex-col justify-around">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={`right-${i}`} className="h-4 w-4 rounded-full bg-background" />
+                        ))}
+                    </div>
+                    <div className="absolute -top-2 left-0 right-0 flex justify-around">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={`top-${i}`} className="h-4 w-4 rounded-full bg-background" />
+                        ))}
+                    </div>
+                    <div className="absolute -bottom-2 left-0 right-0 flex justify-around">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div key={`bottom-${i}`} className="h-4 w-4 rounded-full bg-background" />
+                        ))}
+                    </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="john@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
+                    <div className="relative rounded-lg border-4 border-border bg-card p-8 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="mb-6 text-center">
+                            <h1 className="font-mono text-3xl font-bold text-foreground">Welcome Back</h1>
+                            <p className="mt-2 font-sans text-muted-foreground">Sign in to view your stamps</p>
+                        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            />
-          </div>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="email" className="font-mono flex items-center gap-2">
+                                    <Mail className="h-4 w-4" />
+                                    Email
+                                </Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="you@example.com"
+                                    className="border-2 border-border bg-input font-sans shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)]"
+                                    disabled={loading}
+                                    required
+                                />
+                            </div>
 
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-800 text-sm">{error}</p>
+                            <div className="space-y-2">
+                                <Label htmlFor="password" className="font-mono flex items-center gap-2">
+                                    <Lock className="h-4 w-4" />
+                                    Password
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="border-2 border-border bg-input font-sans shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)]"
+                                    disabled={loading}
+                                    required
+                                />
+                            </div>
+
+                            {error && (
+                                <div className="rounded border-2 border-red-500 bg-red-50 p-3 text-sm text-red-600">
+                                    {error}
+                                </div>
+                            )}
+
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full border-2 border-border bg-primary font-mono text-primary-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? 'Signing in...' : 'Sign In'}
+                            </Button>
+                        </form>
+
+                        <div className="mt-6 text-center">
+                            <p className="text-sm text-muted-foreground font-sans">
+                                {"Don't have an account? "}
+                                <Link
+                                    href="/signup"
+                                    className="font-mono font-semibold text-primary underline decoration-2 underline-offset-2 hover:text-primary/80"
+                                >
+                                    Create one
+                                </Link>
+                            </p>
+                        </div>
+
+                        <div className="mt-4 text-center">
+                            <Link
+                                href="/"
+                                className="text-sm text-muted-foreground font-mono hover:text-foreground underline underline-offset-2"
+                            >
+                                Back to home
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Logging in...' : 'Log In'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <a href="/signup" className="text-blue-600 hover:underline font-semibold">
-              Sign Up
-            </a>
-          </p>
         </div>
-
-        <div className="mt-4 text-center">
-          <a href="/" className="text-gray-500 hover:underline text-sm">
-            ← Back to Home
-          </a>
-        </div>
-
-        <div className="mt-8 border-t pt-6">
-          <p className="text-sm text-gray-500 text-center mb-3">Employer Login</p>
-          <p className="text-xs text-gray-500 text-center">
-            Employers: Use your organization email to access the employer dashboard
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+    )
 }
-
