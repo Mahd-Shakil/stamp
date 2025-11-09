@@ -134,14 +134,11 @@ Visit `http://localhost:3000` in your browser.
 2. View the approved, blockchain-verified credentials
 
 ## Screenshots
+<img width="1800" height="1169" alt="Screenshot 2025-11-09 at 11 26 08 AM" src="https://github.com/user-attachments/assets/3d4a564e-bad7-4693-9584-006a97564324" />
+<img width="1800" height="1169" alt="Screenshot 2025-11-09 at 11 26 04 AM" src="https://github.com/user-attachments/assets/aa4439e1-1971-4df5-af7b-662cea724544" />
+<img width="1800" height="1169" alt="Screenshot 2025-11-09 at 11 27 00 AM" src="https://github.com/user-attachments/assets/f8351a15-be29-42a3-8d42-9ddf8de0d2b7" />
+<img width="1800" height="1169" alt="Screenshot 2025-11-09 at 11 33 18 AM" src="https://github.com/user-attachments/assets/8b55d7a2-5847-4449-aaa9-c0585977ba7d" />
 
-![Screenshot 1](./screenshots/Screenshot 2025-11-09 at 11.26.04 AM.png)
-
-![Screenshot 2](./screenshots/Screenshot 2025-11-09 at 11.26.08 AM.png)
-
-![Screenshot 3](./screenshots/Screenshot 2025-11-09 at 11.27.00 AM.png)
-
-![Screenshot 4](./screenshots/Screenshot 2025-11-09 at 11.30.25 AM.png)
 
 ## Collaborators
 
