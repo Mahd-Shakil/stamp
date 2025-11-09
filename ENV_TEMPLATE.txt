@@ -10,7 +10,9 @@ SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_SOLANA_NETWORK=devnet
 NEXT_PUBLIC_SOLANA_RPC_URL=https://api.devnet.solana.com
 
-# Issuer Wallet Private Key (ALREADY GENERATED)
+# Issuer Wallet Private Key (REQUIRED for minting tokens)
+# This is the shared issuer wallet for the team - required to mint tokens!
+# Issuer wallet address: D44j1wmmiDyJw9Vs8nWQTqwFTRWuY4wjEwHTj3ZoQHPz
 ISSUER_PRIVATE_KEY=UZCwNMAViGRdpC/qDSPgKdevKgUBuUs7pc7oCEdp22mzFTJeq3/fh4vEeXaH/cdsF1URZOat3n8sHE1BefOdbQ==
 
 # Web3.Storage (Optional)
