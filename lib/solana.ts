@@ -22,11 +22,31 @@ export const connection = new Connection(
   'confirmed'
 );
 
-// Load issuer keypair from file for signing transactions
+// Load issuer keypair from file or environment variable for signing transactions
 function loadIssuerKeypair(): Keypair {
-  const keypairPath = path.join(process.cwd(), 'issuer-keypair.json');
-  const keypairData = JSON.parse(fs.readFileSync(keypairPath, 'utf-8'));
-  return Keypair.fromSecretKey(new Uint8Array(keypairData.secretKey));
+  // First, try loading from environment variable (for team members)
+  if (process.env.ISSUER_PRIVATE_KEY) {
+    try {
+      const privateKeyBase64 = process.env.ISSUER_PRIVATE_KEY;
+      const privateKeyBytes = Buffer.from(privateKeyBase64, 'base64');
+      return Keypair.fromSecretKey(privateKeyBytes);
+    } catch (error) {
+      console.error('Failed to load issuer keypair from environment variable:', error);
+    }
+  }
+  
+  // Fallback to file (for local development)
+  try {
+    const keypairPath = path.join(process.cwd(), 'issuer-keypair.json');
+    if (fs.existsSync(keypairPath)) {
+      const keypairData = JSON.parse(fs.readFileSync(keypairPath, 'utf-8'));
+      return Keypair.fromSecretKey(new Uint8Array(keypairData.secretKey));
+    }
+  } catch (error) {
+    console.error('Failed to load issuer keypair from file:', error);
+  }
+  
+  throw new Error('Issuer keypair not found! Please set ISSUER_PRIVATE_KEY in .env.local or create issuer-keypair.json');
 }
 
 // Initialize Metaplex SDK for NFT operations
