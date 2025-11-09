@@ -7,7 +7,7 @@ export default function Navbar() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center">
+                    <Link href="/" className="flex items-center gap-1">
                         <svg fill="#363030" viewBox="-17.14 0 168.786 168.786" xmlns="http://www.w3.org/2000/svg" stroke="#363030" className="h-8 w-8 text-foreground">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="8.101728">

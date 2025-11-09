@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Mail, Lock, User } from "lucide-react"
+import { Mail, Lock, User, Hash } from "lucide-react"
 
 export default function SignupPage() {
     const [name, setName] = useState("")
+    const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
@@ -35,13 +36,26 @@ export default function SignupPage() {
             return
         }
 
+        if (!username || username.length < 3) {
+            setError("Username must be at least 3 characters")
+            setIsLoading(false)
+            return
+        }
+
+        // Validate username format (alphanumeric and underscores only)
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            setError("Username can only contain letters, numbers, and underscores")
+            setIsLoading(false)
+            return
+        }
+
         try {
             const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({ name, username, email, password }),
             })
 
             const result = await response.json()
@@ -86,6 +100,28 @@ export default function SignupPage() {
                                     disabled={isLoading}
                                     required
                                 />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="username" className="font-mono flex items-center gap-2">
+                                    <Hash className="h-4 w-4" />
+                                    Username
+                                </Label>
+                                <Input
+                                    id="username"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                                    placeholder="johndoe"
+                                    className="border-2 border-border bg-input font-sans shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)]"
+                                    disabled={isLoading}
+                                    required
+                                    minLength={3}
+                                    pattern="[a-zA-Z0-9_]+"
+                                />
+                                <p className="text-xs text-muted-foreground font-sans">
+                                    This will be your public profile URL: /vouch/{username || 'username'}
+                                </p>
                             </div>
 
                             <div className="space-y-2">
