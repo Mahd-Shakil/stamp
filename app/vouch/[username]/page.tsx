@@ -102,9 +102,21 @@ export default async function PublicVouchProfile({ params }: PageProps) {
                         <h3 className="text-xl font-bold text-gray-900">
                           {cred.role_title}
                         </h3>
-                        <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
-                          Verified
-                        </span>
+                        {cred.token_address ? (
+                          <a
+                            href={`https://explorer.solana.com/address/${cred.token_address}/metadata?cluster=devnet`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium hover:bg-green-200 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                            title="View on Solana Explorer"
+                          >
+                            ✓ Verified
+                          </a>
+                        ) : (
+                          <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-medium">
+                            Verified
+                          </span>
+                        )}
                       </div>
                       <p className="text-lg text-gray-700 font-medium mb-2">
                         {cred.company_name}
@@ -123,9 +135,15 @@ export default async function PublicVouchProfile({ params }: PageProps) {
                       {cred.token_address && (
                         <div className="mt-3">
                           <p className="text-xs text-gray-500 mb-1">On-Chain Token:</p>
-                          <p className="font-mono text-xs bg-gray-50 px-2 py-1 rounded border inline-block">
+                          <a
+                            href={`https://explorer.solana.com/address/${cred.token_address}/metadata?cluster=devnet`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-mono text-xs bg-gray-50 px-2 py-1 rounded border inline-block hover:bg-gray-100 hover:border-gray-400 transition-colors cursor-pointer"
+                            title="View on Solana Explorer"
+                          >
                             {cred.token_address}
-                          </p>
+                          </a>
                         </div>
                       )}
                     </div>

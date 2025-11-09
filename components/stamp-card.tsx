@@ -7,9 +7,13 @@ interface StampCardProps {
   period: string
   status: "verified" | "pending"
   color: string
+  tokenAddress?: string
 }
 
-export function StampCard({ company, role, period, status, color }: StampCardProps) {
+export function StampCard({ company, role, period, status, color, tokenAddress }: StampCardProps) {
+  const explorerUrl = tokenAddress 
+    ? `https://explorer.solana.com/address/${tokenAddress}/metadata?cluster=devnet`
+    : null
   return (
     <div className="group relative">
       {/* Stamp content */}
@@ -19,22 +23,40 @@ export function StampCard({ company, role, period, status, color }: StampCardPro
           className={`relative flex items-center justify-between bg-gradient-to-br ${color} px-6 py-4 text-foreground`}
         >
           <h3 className="font-mono font-bold">{company}</h3>
-          <Badge
-            variant={status === "verified" ? "default" : "secondary"}
-            className="border-2 border-border bg-background/90 font-mono text-xs shadow-sm"
-          >
-            {status === "verified" ? (
-              <>
+          {status === "verified" && explorerUrl ? (
+            <a
+              href={explorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-transform hover:scale-105"
+              title="View on Solana Explorer"
+            >
+              <Badge
+                variant="default"
+                className="border-2 border-border bg-background/90 font-mono text-xs shadow-sm cursor-pointer hover:bg-background"
+              >
                 <CheckCircle2 className="mr-1 h-3 w-3" />
                 Verified
-              </>
-            ) : (
-              <>
-                <Clock className="mr-1 h-3 w-3" />
-                Pending
-              </>
-            )}
-          </Badge>
+              </Badge>
+            </a>
+          ) : (
+            <Badge
+              variant={status === "verified" ? "default" : "secondary"}
+              className="border-2 border-border bg-background/90 font-mono text-xs shadow-sm"
+            >
+              {status === "verified" ? (
+                <>
+                  <CheckCircle2 className="mr-1 h-3 w-3" />
+                  Verified
+                </>
+              ) : (
+                <>
+                  <Clock className="mr-1 h-3 w-3" />
+                  Pending
+                </>
+              )}
+            </Badge>
+          )}
         </div>
 
         {/* Body with role and period */}
@@ -46,13 +68,25 @@ export function StampCard({ company, role, period, status, color }: StampCardPro
 
           {/* Decorative verification mark */}
           <div className="mt-4 flex justify-end">
-            <div className="rounded-full border-2 border-border bg-muted/50 p-3 shadow-sm">
-              {status === "verified" ? (
+            {status === "verified" && explorerUrl ? (
+              <a
+                href={explorerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full border-2 border-border bg-muted/50 p-3 shadow-sm transition-all hover:bg-muted hover:scale-110"
+                title="View on Solana Explorer"
+              >
                 <CheckCircle2 className="h-6 w-6 text-muted-foreground" />
-              ) : (
-                <Clock className="h-6 w-6 text-muted-foreground" />
-              )}
-            </div>
+              </a>
+            ) : (
+              <div className="rounded-full border-2 border-border bg-muted/50 p-3 shadow-sm">
+                {status === "verified" ? (
+                  <CheckCircle2 className="h-6 w-6 text-muted-foreground" />
+                ) : (
+                  <Clock className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

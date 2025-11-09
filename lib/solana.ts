@@ -129,7 +129,7 @@ export async function mintCredentialSimplified(
     const metadataJson = {
       name: `${metadata.company} - ${metadata.role}`,
       description: `Verified by ${metadata.verified_by}`,
-      image: 'https://via.placeholder.com/400x400.png?text=Vouch',
+      image: 'https://via.placeholder.com/400x400.png?text=Stamp',
       attributes: [
         { trait_type: 'Company', value: metadata.company },
         { trait_type: 'Role', value: metadata.role },
@@ -150,9 +150,9 @@ export async function mintCredentialSimplified(
     console.log('[SOLANA] Creating NFT on Solana blockchain...');
     const { nft } = await metaplex.nfts().create({
       uri,
-      name: `Vouch: ${metadata.company}`,
+      name: `Stamp: ${metadata.company}`,
       sellerFeeBasisPoints: 0, // No royalties
-      symbol: 'VOUCH',
+      symbol: 'STAMP',
       creators: [
         {
           address: issuerKeypair.publicKey,

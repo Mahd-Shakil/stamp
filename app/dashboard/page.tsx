@@ -257,6 +257,7 @@ export default function Dashboard() {
     color: cred.status === 'approved' 
       ? ['from-yellow-400 to-amber-500', 'from-sky-300 to-blue-400', 'from-emerald-400 to-green-500'][index % 3]
       : 'from-slate-200 to-gray-300',
+    tokenAddress: cred.token_address,
   }))
 
   if (loading) {
