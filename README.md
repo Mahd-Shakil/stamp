@@ -1,6 +1,7 @@
 # Stamp
 
 A blockchain-based resume verification platform that makes credential verification instant, free, and trustworthy. Share your verified work experience via a public link in job applications.
+[Devpost Link]{https://devpost.com/software/vouch-8fkrc1}
 
 ## Details
 
